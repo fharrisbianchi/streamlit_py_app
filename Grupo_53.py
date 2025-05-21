@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.express as px
 import numpy as np
+from matplotlib import cm
 
 # Configuración inicial
 st.set_page_config(page_title="Análisis de Supermercado - Myanmar", layout="wide", initial_sidebar_state='expanded')
@@ -45,6 +46,7 @@ st.markdown("""
 def cargar_datos():
     df = pd.read_csv("data.csv")
     return df
+
 # Cargar datos
 df = cargar_datos()
 
@@ -91,7 +93,6 @@ traducciones = {
 df['Gender'] = df['Gender'].map(traducciones) 
 
 # FILTROS
-
 st.sidebar.header("Filtros")
 fecha_inicio = st.sidebar.date_input("Selecciona una fecha de inicio:", df["Date"].min())
 fecha_fin = st.sidebar.date_input("Selecciona una fecha final:", df["Date"].max())
@@ -241,8 +242,21 @@ fig8.update_layout(width=800, height=800)
 st.plotly_chart(fig8)
 st.write("*Presenta el ingreso bruto generado por cada línea de producto en cada sucursal, facilitando la comparación entre tiendas y el análisis del aporte individual de cada categoría al total de ingresos.*")
 
+# Visualización 3D: Relación entre Costo, Ganancia Bruta y Precio Unitario
+if df.empty:
+    st.warning("No hay datos disponibles para mostrar la visualización 3D.")
+else:
+    fig = plt.figure(figsize=(8, 6))
+    ax = fig.add_subplot(111, projection='3d')
+    colors = cm.Blues(df['Rating'] / 10)
+    ax.scatter(df['cogs'], df['gross income'], df['Unit price'], c=colors)
+    ax.set_xlabel('Costo', fontsize=10)
+    ax.set_ylabel('Ganancia Bruta', fontsize=10)
+    ax.set_zlabel('Precio Unitario', fontsize=10)
+    ax.set_title('Visualización 3D: Costo vs Ganancia vs Precio')
+    ax.zaxis.labelpad = -15  # Label a la izquierda
+    st.pyplot(fig)  # Mostrar la figura en Streamlit
 
 # Pie de página
 st.markdown("---")
 st.caption("Análisis de Datos de una Cadena de Supermercados | Datos: data.csv | Grupo:53")
-
